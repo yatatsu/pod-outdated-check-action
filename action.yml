@@ -1,0 +1,23 @@
+name: 'Cocoapods outdated check action'
+description: 'Run `pod outdated` to find outdated pods in your project.'
+author: 'yatatsu'
+inputs:
+  project_directory:
+    required: true
+    description: 'The path to the root of the pods project.'
+  exclude_pods:
+    required: false
+    description: 'The pod group should be ignored. (comma separeted)'
+  podspec:
+    required: false
+    description: 'The path to the podspec that you want to check dependencies.'
+outputs:
+  has_any_outdated:
+    description: 'It will be `true` if any pods have been outdated, or `false`.'
+  outdated_pod_info:
+    description: 'The original text of outdated pods info.'
+  outdated_pod_json:
+    description: 'The json structured outdated pods info.'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
