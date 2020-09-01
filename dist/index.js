@@ -116,7 +116,7 @@ const exec_1 = __webpack_require__(757);
 const podspec_1 = __webpack_require__(208);
 const outdated_1 = __webpack_require__(608);
 function checkPlatform() {
-    if (process.platform === "darwin") {
+    if (process.platform !== "darwin") {
         throw Error("Action only runs on macOS❌");
     }
 }
@@ -152,11 +152,11 @@ function run() {
             core.setOutput("has_any_outdated", result.hasAnyOutdated);
             core.setOutput("outdated_pod_info", result.info);
             core.setOutput("outdated_pod_json", JSON.stringify(result));
+            core.info(`✅ Pod Outdated Check Action completed!`);
         }
         catch (error) {
             core.setFailed(error.message);
         }
-        core.info(`✅ Pod Outdated Check Action completed!`);
     });
 }
 run();
@@ -169,11 +169,15 @@ run();
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.findOutdated = exports.buildOutdatedInfo = void 0;
+exports.findOutdated = void 0;
 const os_1 = __webpack_require__(87);
-exports.buildOutdatedInfo = (pods) => {
+const buildOutdatedInfo = (pods) => {
     return pods
-        .map((p) => `${p.name}: new version available ${p.current} -> ${p.available} (latest version ${p.latestVersion})`)
+        .map((p) => {
+        var _a;
+        const available = (_a = p.available) !== null && _a !== void 0 ? _a : "(unused)";
+        return `${p.name}: new version available ${p.current} -> ${available} (latest version ${p.latestVersion})`;
+    })
         .join(os_1.EOL);
 };
 exports.findOutdated = (source, excludes, podspec) => {
@@ -181,8 +185,7 @@ exports.findOutdated = (source, excludes, podspec) => {
     const pods = [];
     const lines = source.split(os_1.EOL);
     // e.g. - Firebase 6.28.0 -> 6.31.0 (latest version 6.31.0)
-    const version = "[wd.\\-]+";
-    const regex = new RegExp(`^\\-\\s([\\w\\d]+)\\s(${version})\\s\\-]\\>\\s(${version}|\\(unused\\))\\s\\(latest\\sversion\\s(${version})\\)$`);
+    const regex = /^-\s([\w]+)\s([\w.-]+)\s->\s([\w.-]+|\(unused\))\s\(latest\sversion\s([\w.-]+)\)$/;
     for (const line of lines) {
         if (line.startsWith("-")) {
             const found = (_a = line.match(regex)) !== null && _a !== void 0 ? _a : [];
@@ -191,7 +194,7 @@ exports.findOutdated = (source, excludes, podspec) => {
                     name: found[1],
                     current: found[2],
                     available: found[3] === "(unused)" ? null : found[3],
-                    latestVersion: found[3],
+                    latestVersion: found[4],
                     rawValue: line,
                 };
                 if (excludes && excludes.includes(pod.name)) {
@@ -206,7 +209,7 @@ exports.findOutdated = (source, excludes, podspec) => {
     return {
         hasAnyOutdated: pods.length > 0,
         outdatedPods: pods,
-        info: exports.buildOutdatedInfo(pods),
+        info: buildOutdatedInfo(pods),
     };
 };
 
@@ -223,20 +226,22 @@ const os_1 = __webpack_require__(87);
 exports.validatePodspec = (source) => {
     var _a;
     const lines = source.split(os_1.EOL);
-    const deps = [];
-    const regex = /[\w\\.+]\.dependency[\s+]["']([\w\d+])(?:\/([\w\d+]))?["']/;
+    const depsMap = {};
+    const regex = /^\s+[\w\\.]+\.dependency[\s]+["']([\w]+)(?:\/([\w]+))?["'].*$/;
     for (const line of lines) {
         const found = (_a = line.match(regex)) !== null && _a !== void 0 ? _a : [];
         if (found.length > 1) {
-            deps.push({
+            const pod = {
                 name: found[1],
-                subspec: found.length == 3 ? found[2] : null,
-            });
+                subspec: found.length == 3 ? found[2] : undefined,
+            };
+            const key = pod.name + (pod.subspec ? `/${pod.subspec}` : "");
+            depsMap[key] = pod;
         }
     }
     return {
         raw: source,
-        deps: deps,
+        deps: Object.values(depsMap),
     };
 };
 

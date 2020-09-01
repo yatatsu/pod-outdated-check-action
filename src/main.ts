@@ -48,10 +48,10 @@ async function run(): Promise<void> {
         core.setOutput("has_any_outdated", result.hasAnyOutdated);
         core.setOutput("outdated_pod_info", result.info);
         core.setOutput("outdated_pod_json", JSON.stringify(result));
+        core.info(`✅ Pod Outdated Check Action completed!`);
     } catch (error) {
         core.setFailed(error.message);
     }
-    core.info(`✅ Pod Outdated Check Action completed!`);
 }
 
 run();
