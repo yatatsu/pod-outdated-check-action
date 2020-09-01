@@ -36,7 +36,7 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: yatatsu/pod-outdated-check-action@v0.1.0
+    - uses: yatatsu/pod-outdated-check-action@v0.3.0
       id: outdated
       with:
         project_directory: example/ios
