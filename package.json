@@ -5,20 +5,22 @@
   "description": "Check Cocoapods dependencies outdated",
   "main": "lib/main.js",
   "scripts": {
+    "clean": "rm -rf lib",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "package": "ncc build --source-map",
     "test": "jest",
     "preversion": "npm run lint && npm test",
-    "version": "npm run build && npm run package && git add ."
+    "version": "npm run clean && npm run build && npm run package && git add ."
   },
   "keywords": [],
   "author": "yatatsu",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.5",
-    "@actions/exec": "^1.0.4"
+    "@actions/exec": "^1.0.4",
+    "shelljs": "^0.8.4"
   },
   "prettier": {
     "singleQuote": false,
@@ -44,6 +46,7 @@
   "devDependencies": {
     "@types/jest": "^26.0.12",
     "@types/node": "^14.6.2",
+    "@types/shelljs": "^0.8.8",
     "@typescript-eslint/eslint-plugin": "^4.0.0",
     "@typescript-eslint/parser": "^3.10.1",
     "@vercel/ncc": "^0.24.0",
