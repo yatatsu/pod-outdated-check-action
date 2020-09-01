@@ -1,5 +1,7 @@
 # Pod Outdated Check Action
 
+![build-test](https://github.com/yatatsu/pod-outdated-check-action/workflows/build-test/badge.svg)
+
 - Run `pod outdated` on GitHub Action.
 - Check your `Podfile` or `*.podspec` dependencies outdated.
 - Only available on macOS.
@@ -34,8 +36,11 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: yatatsu/pod-outdated-check-action@v4
+    - uses: yatatsu/pod-outdated-check-action@v0.1.0
       id: outdated
+      with:
+        project_directory: example/ios
+        podspec: lib/my-library.podspec
     - name: Create Issue
       if: steps.outdated.outputs.has_any_outdated != 'false'
       run: |
