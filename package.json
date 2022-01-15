@@ -20,7 +20,7 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
-    "shelljs": "^0.8.4"
+    "shelljs": "^0.8.5"
   },
   "prettier": {
     "singleQuote": false,
